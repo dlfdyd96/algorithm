@@ -14,7 +14,6 @@ import java.util.StringTokenizer;
  *  ans += 'AAAA' * (xCnt / 4) + 'BB';
  * else:
  *  return "-1";
- *
  */
 public class Main {
     public static void main(String[] args) throws Exception {
