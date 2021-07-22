@@ -3,9 +3,11 @@ import java.util.Map;
 
 public class Test {
     public static void main(String[] args) {
-        Map<Integer, Integer> map = new HashMap<>();
-        map.put(2, 5);
-        map.get(5);
-        System.out.println(map.get(5));
+        String binary1 = "101";
+        String binary2 = "100111";
+        int result =  Integer.parseInt(binary1, 2) & Integer.parseInt(binary2, 2);
+        System.out.printf("%d: %s\n", result, Integer.toBinaryString(result));
+
+        System.out.println(Integer.toBinaryString((1 << 2)));
     }
 }
