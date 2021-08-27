@@ -4,10 +4,7 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.StringTokenizer;
+import java.util.*;
 
 /**
  * 지훈쓰 위치가
@@ -83,6 +80,11 @@ public class BJ4179 {
         for (int i = 0; i < R; i++) {
             String line = br.readLine();
             char[] charLine = line.toCharArray();
+
+            int[] arr = Arrays.asList(
+                        br.readLine().split("")
+                    ).stream().mapToInt(Integer::parseInt).toArray();
+
 
             for (int j = 0; j < C; j++) {
                 field[i][j] = charLine[j];
