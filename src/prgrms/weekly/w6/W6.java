@@ -1,75 +1,77 @@
 package prgrms.weekly.w6;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class W6 {
     public static void main(String[] args) {
-        int solution = new Solution().solution(new int[][]{{0, 3}, {1, 9}, {2, 6}});
-        System.out.println(solution);
+        int[] solution = new Solution().solution(
+//                new int[]{50, 82, 75, 120}, new String[]{"NLWL", "WNLL", "LWNW", "WWLN"}
+                 new int[]{145,92,86}, new String[]{"NLW","WNL","LWN"}
+//                 new int[]{60,70,60}, new String[]{"NNN","NNN","NNN"}
+        );
+        Arrays.stream(solution).forEach(System.out::println);
     }
 }
 
-// 스케쥴링 알고리즘 중 Shortest Job First
-// 실제로는 프로세스 사용시간이 얼마만큼인지 몰라서 사용 불가능한 알고리즘이지만 주어진 입력 값을 활용하면 댐
+class Fighter {
+    public int weight;
+    public String record;
+    public int idx;
 
-// 매초 마다의 time의 흐름이 포인뜨
-// Job 클래스를 선언해주고
-// 도착한 시간이 빠른 순서대로 정렬된 대기큐 (얘는 그냥 List sort)
-// 작업이 빨리 되는 작업 큐 두 개를 선언해준다. (얘는 PriorityQueue)
+    public Fighter(int weight, String record, int idx) {
+        this.weight = weight;
+        this.record = record;
+        this.idx = idx;
+    }
 
-class Job {
-    public int arriveTime;
-    public int workingtime;
+    public double getWinRate() {
+        return record.chars()
+                .filter((c) -> c != 'N')
+                .map((c) -> c == 'W' ? 1 : 0)
+                .average()
+                .orElse(0);
+    }
 
-    public Job(int arriveTime, int workingTime) {
-        this.arriveTime = arriveTime;
-        this.workingtime = workingTime;
+    // The number of times you beat a boxer who weighs more than you.
+    public int countWinOfMoreThanSelfWeight(int[] weights) {
+        int cnt = 0;
+        for (int i = 0; i < weights.length; i++) {
+            if (record.charAt(i) == 'W') {
+                if (weights[i] > weight) cnt++;
+            }
+        }
+        return cnt;
     }
 }
 
 class Solution {
-    public int solution(int[][] jobs) {
-        LinkedList<Job> waitingQueue = new LinkedList<>();
-        PriorityQueue<Job> workingQueue = new PriorityQueue<>(new Comparator<Job>() {
-            @Override
-            public int compare(Job o1, Job o2) {
-                return o1.workingtime - o2.workingtime;
-            }
-        });
-        for (int[] job : jobs) {
-            waitingQueue.add(new Job(job[0], job[1]));
-        }
-        Collections.sort(waitingQueue, new Comparator<Job>() {
-            @Override
-            public int compare(Job o1, Job o2) {
-                return o1.arriveTime - o2.arriveTime; // 음수가 나오면 o1이 먼저임!
-            }
-        });
-        // 여기까지가 초기화 작업
-
-        int answer = 0; // 나중에 리턴 ㅋㅋ
-        int cnt = 0; // 작업 개수 만큼 iterate
-        int time = 0; // 아까 말해줬던 타임이 뽀인뜨!
-
-
-        while(cnt < jobs.length) {
-
-            while (!waitingQueue.isEmpty() && waitingQueue.peek().arriveTime <= time) {
-                Job currentJob = waitingQueue.pollFirst();
-                workingQueue.add(currentJob);
-            }
-
-            if (!workingQueue.isEmpty()) {
-                Job currentJob = workingQueue.poll();
-                time += currentJob.workingtime;
-                answer += time - currentJob.arriveTime;
-                cnt++;
-            } else {
-                time++;
-            }
+    public int[] solution(int[] weights, String[] head2head) {
+        // 초기화
+        List<Fighter> ranks = new ArrayList<>();
+        for (int i = 0; i < weights.length; i++) {
+            ranks.add(new Fighter(weights[i], head2head[i], i + 1));
         }
 
+        Collections.sort(ranks, new Comparator<Fighter>() {
+            @Override
+            public int compare(Fighter o1, Fighter o2) {
+                int resultCompareWinRate = Double.compare(o1.getWinRate(), o2.getWinRate());
+                if (resultCompareWinRate != 0) return -resultCompareWinRate;
 
-        return answer / cnt;
+                int resultCompareWinOverWeightCnt = Integer.compare(
+                        o1.countWinOfMoreThanSelfWeight(weights),
+                        o2.countWinOfMoreThanSelfWeight(weights)
+                );
+                if (resultCompareWinOverWeightCnt != 0) return -resultCompareWinOverWeightCnt;
+
+                int resultCompareWeight = Integer.compare(o1.weight, o2.weight);
+                if (resultCompareWeight != 0) return -resultCompareWeight;
+
+                return Integer.compare(o1.idx, o2.idx);
+            }
+        });
+
+        return ranks.stream().mapToInt(item->item.idx).toArray();
     }
 }
